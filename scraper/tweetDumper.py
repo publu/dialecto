@@ -18,10 +18,14 @@ def get_all_tweets(screen_name, country):
 	auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 	auth.set_access_token(access_key, access_secret)
 	api = tweepy.API(auth)
-	
+
 	#initialize a list to hold all the tweepy Tweets
 	alltweets = []	
 	
+	# if the file exists, get id 
+
+	
+
 	#make initial request for most recent tweets (200 is the maximum allowed count)
 	new_tweets = api.user_timeline(screen_name = screen_name,count=200)
 	
@@ -32,6 +36,8 @@ def get_all_tweets(screen_name, country):
 	oldest = alltweets[-1].id - 1
 	
 	#keep grabbing tweets until there are no tweets left to grab
+
+
 	while len(new_tweets) > 0:
 		print "before %s" % (oldest)
 		
@@ -50,9 +56,10 @@ def get_all_tweets(screen_name, country):
 	#transform the tweepy tweets into a 2D array that will populate the csv	
 	for tweet in alltweets:
 		text = tweet.text.encode("utf-8")
+		id_str = tweet.id_str.encode("utf-8")
 		text = re.sub(r'http\S+', "", text)	# cleaning urls
 		text = re.sub(r'[\"#]', "", text)	# cleaning quotes and hashtags
-		outtweets.append([text, country])
+		outtweets.append([id_str,text, country])
 
 	#outtweets = [[screen_name, tweet.text.encode("utf-8")] for tweet in alltweets]
 	
