@@ -1,4 +1,5 @@
 import tweepy
+from collections import deque
 import csv
 import re
 from time import sleep
@@ -8,6 +9,14 @@ consumer_key = "SV58jiykYH6UE9cJB21CegNMF"
 consumer_secret = "DQK88ZvmcM15aGTskSjnnSXNg8rDvqKy9GnH9wrmWSXa34ok1T"
 access_key = "118191893-ZTHPSE3NZ7lkpMjEuHhrhiZLf9pKKKup40Pjlcrf"
 access_secret = "hHxny6xs7uuisYYFLHP0Ip6tNcBpuaUblRRF9RQWPJ79d"
+
+def get_last_row(csv_filename):
+    with open(csv_filename, 'r') as f:
+        try:
+            lastrow = deque(csv.reader(f), 1)[0]
+        except IndexError:  # empty file
+            lastrow = None
+        return lastrow
 
 def get_all_tweets(screen_name, country):
 	#Twitter only allows access to a users most recent 3240 tweets with this method
@@ -23,54 +32,68 @@ def get_all_tweets(screen_name, country):
 	alltweets = []	
 	
 	# if the file exists, get id 
+	file_name = '%s_tweets.csv' % screen_name
 
-	
+	last_id = list(get_last_row(file_name))[0]
 
 	#make initial request for most recent tweets (200 is the maximum allowed count)
-	new_tweets = api.user_timeline(screen_name = screen_name,count=200)
-	
-	#save most recent tweets
-	alltweets.extend(new_tweets)
-	
-	#save the id of the oldest tweet less one
-	oldest = alltweets[-1].id - 1
-	
-	#keep grabbing tweets until there are no tweets left to grab
+	new_tweets = api.user_timeline(screen_name = screen_name,count=200,max_id=last_id)
 
+	time = 5
 
-	while len(new_tweets) > 0:
-		print "before %s" % (oldest)
-		
-		#all subsiquent requests use the max_id param to prevent duplicates
-		new_tweets = api.user_timeline(screen_name = screen_name,count=200,max_id=oldest)
-		
+	if(len(new_tweets) != 0):
 		#save most recent tweets
 		alltweets.extend(new_tweets)
-		
-		#update the id of the oldest tweet less one
-		oldest = alltweets[-1].id - 1
-		
-		print "%s tweets so far" % (len(alltweets))
-	
-	outtweets = []
-	#transform the tweepy tweets into a 2D array that will populate the csv	
-	for tweet in alltweets:
-		text = tweet.text.encode("utf-8")
-		id_str = tweet.id_str.encode("utf-8")
-		text = re.sub(r'http\S+', "", text)	# cleaning urls
-		text = re.sub(r'[\"#]', "", text)	# cleaning quotes and hashtags
-		outtweets.append([id_str,text, country])
 
-	#outtweets = [[screen_name, tweet.text.encode("utf-8")] for tweet in alltweets]
-	
-	#write the csv	
-	with open('%s_tweets.csv' % screen_name, 'wb') as f:
-		writer = csv.writer(f)
-		writer.writerow(["text","class"])
-		writer.writerows(outtweets)
-	
-	print "now we wait 90 seconds..."
-	sleep(90)
+		oldest = alltweets[-1].id
+
+		#keep grabbing tweets until there are no tweets left to grab
+
+		while len(new_tweets) > 0:
+			print "before %s" % (oldest)
+			
+			#all subsiquent requests use the max_id param to prevent duplicates
+			new_tweets = api.user_timeline(screen_name = screen_name,count=200,max_id=oldest)
+			
+			#save most recent tweets
+			alltweets.extend(new_tweets)
+			
+			#update the id of the oldest tweet less one
+			oldest = alltweets[-1].id - 1
+			
+			print "%s tweets so far" % (len(alltweets))
+		
+		outtweets = []
+		#transform the tweepy tweets into a 2D array that will populate the csv	
+		for tweet in alltweets:
+			text = tweet.text.encode("utf-8")
+			id_str = tweet.id_str.encode("utf-8")
+			text = re.sub(r'http\S+', "", text)	# cleaning urls
+			text = re.sub(r'[\"#]', "", text)	# cleaning quotes and hashtags
+			text = re.sub(r'[\n]', "", text)	# cleaning quotes and hashtags
+
+			outtweets.append([id_str,text,country])
+
+		#outtweets = [[screen_name, tweet.text.encode("utf-8")] for tweet in alltweets]
+		
+		if(len(outtweets) > 60):
+			time = 60
+		else:
+			time = len(outtweets)
+
+		#write the csv
+
+		with open(file_name, 'a') as f:
+			writer = csv.writer(f)
+			#writer.writerow(["id_str","text","class"])
+			writer.writerows(outtweets)
+
+	else:
+		time = 0
+		print "no new tweets found."
+
+	print "now we wait %s seconds..." % str(time)
+	sleep(time)
 	pass
 
 
