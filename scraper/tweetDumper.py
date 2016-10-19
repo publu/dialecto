@@ -34,18 +34,19 @@ def get_all_tweets(screen_name, country):
 	# if the file exists, get id 
 	file_name = '%s_tweets.csv' % screen_name
 
-	last_id = list(get_last_row(file_name))[0]
+	last_id = int(list(get_last_row(file_name))[0])
+
+	print "last tweet %s" % last_id
 
 	#make initial request for most recent tweets (200 is the maximum allowed count)
-	new_tweets = api.user_timeline(screen_name = screen_name,count=200,max_id=last_id)
+	new_tweets = api.user_timeline(screen_name = screen_name,count=200,since_id=last_id)
 
 	time = 5
-
 	if(len(new_tweets) != 0):
 		#save most recent tweets
 		alltweets.extend(new_tweets)
 
-		oldest = alltweets[-1].id
+		oldest = alltweets[0].id
 
 		#keep grabbing tweets until there are no tweets left to grab
 
@@ -53,7 +54,7 @@ def get_all_tweets(screen_name, country):
 			print "before %s" % (oldest)
 			
 			#all subsiquent requests use the max_id param to prevent duplicates
-			new_tweets = api.user_timeline(screen_name = screen_name,count=200,max_id=oldest)
+			new_tweets = api.user_timeline(screen_name = screen_name,count=200,max_id=oldest,since_id=last_id)
 			
 			#save most recent tweets
 			alltweets.extend(new_tweets)
