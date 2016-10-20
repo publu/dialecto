@@ -77,8 +77,8 @@ def get_all_tweets(screen_name, country):
 
 		#outtweets = [[screen_name, tweet.text.encode("utf-8")] for tweet in alltweets]
 		
-		if(len(outtweets) > 60):
-			time = 60
+		if(len(outtweets) > 450):
+			time = 450	#7.5 mins == 1/2 of the 15 min window
 		else:
 			time = len(outtweets)
 
@@ -103,9 +103,9 @@ if __name__ == '__main__':
 	chile 	=	["latercera", "Emol", "TVN", "CNNChile", "Cooperativa"]
 	arg		=	["eltreceoficial", "LANACION", "clarincom", "24conurbano", "populardiario"]
 	col 	=	["NoticiasRCN", "ELTIEMPO", "elespectador", "elpaiscali"]
-	mex		=	["CNNMex", "NTelevisa_com", "lopezdoriga", "EPN"]
+	mex		=	["NTelevisa_com", "lopezdoriga", "EPN"]
 	spain	=	["abc_es", "informacion_es", "elperiodico", "_rebelion_org", "Overwatch_Esp", "radiocable"]
-	usa 	=	["ElNuevoDia", "primerahora", "LaOpinionLA", "elnuevoherald", "vivelohoy", "despiertamerica"]
+	usa 	=	["despiertamerica"]
 
 	for account in chile:
 		get_all_tweets(account, "Chile")
