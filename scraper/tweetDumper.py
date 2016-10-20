@@ -53,27 +53,34 @@ def get_all_tweets(screen_name, country):
 		while len(new_tweets) > 0:
 			print "before %s" % (oldest)
 			
-			#all subsiquent requests use the max_id param to prevent duplicates
-			new_tweets = api.user_timeline(screen_name = screen_name,count=200,max_id=oldest,since_id=last_id)
-			
-			#save most recent tweets
-			alltweets.extend(new_tweets)
-			
-			#update the id of the oldest tweet less one
-			oldest = alltweets[-1].id - 1
-			
-			print "%s tweets so far" % (len(alltweets))
+			print last_id
+			if(int(oldest)<int(last_id) ):
+				print "deleting"
+				new_tweets = []
+			else:
+				#all subsiquent requests use the max_id param to prevent duplicates
+				new_tweets = api.user_timeline(screen_name = screen_name,count=200,max_id=oldest)
+				
+				#save most recent tweets
+				alltweets.extend(new_tweets)
+				
+				#update the id of the oldest tweet less one
+				oldest = alltweets[-1].id - 1
+
+				print "%s tweets so far" % (len(alltweets))
 		
 		outtweets = []
 		#transform the tweepy tweets into a 2D array that will populate the csv	
 		for tweet in alltweets:
-			text = tweet.text.encode("utf-8")
-			id_str = tweet.id_str.encode("utf-8")
-			text = re.sub(r'http\S+', "", text)	# cleaning urls
-			text = re.sub(r'[\"#]', "", text)	# cleaning quotes and hashtags
-			text = re.sub(r'[\n]', "", text)	# cleaning quotes and hashtags
-
-			outtweets.append([id_str,text,country])
+			if(last_id < tweet.id): #if the id is newer
+				text = tweet.text.encode("utf-8")
+				id_str = tweet.id_str.encode("utf-8")
+				text = re.sub(r'http\S+', "", text)	# cleaning urls
+				text = re.sub(r'[\"#]', "", text)	# cleaning quotes and hashtags
+				text = re.sub(r'[\n]', "", text)	# cleaning quotes and hashtags
+				outtweets.append([id_str,text,country])
+			#else:
+				#print "removing"
 
 		#outtweets = [[screen_name, tweet.text.encode("utf-8")] for tweet in alltweets]
 		
@@ -94,7 +101,7 @@ def get_all_tweets(screen_name, country):
 		print "no new tweets found."
 
 	print "now we wait %s seconds..." % str(time)
-	sleep(time)
+	#sleep(time)
 	pass
 
 
