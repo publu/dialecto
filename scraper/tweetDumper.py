@@ -51,9 +51,7 @@ def get_all_tweets(screen_name, country):
 		#keep grabbing tweets until there are no tweets left to grab
 
 		while len(new_tweets) > 0:
-			print "before %s" % (oldest)
-			
-			print last_id
+			print "before %s but after %s" % ((oldest),(last_id) )
 			if(int(oldest)<int(last_id) ):
 				print "deleting"
 				new_tweets = []
@@ -70,6 +68,7 @@ def get_all_tweets(screen_name, country):
 				print "%s tweets so far" % (len(alltweets))
 		
 		outtweets = []
+		deleted=0
 		#transform the tweepy tweets into a 2D array that will populate the csv	
 		for tweet in alltweets:
 			if(last_id < tweet.id): #if the id is newer
@@ -79,9 +78,9 @@ def get_all_tweets(screen_name, country):
 				text = re.sub(r'[\"#]', "", text)	# cleaning quotes and hashtags
 				text = re.sub(r'[\n]', "", text)	# cleaning quotes and hashtags
 				outtweets.append([id_str,text,country])
-			#else:
-				#print "removing"
-
+			else:
+				deleted +=1
+		print "total deleted %s" % deleted
 		#outtweets = [[screen_name, tweet.text.encode("utf-8")] for tweet in alltweets]
 		
 		if(len(outtweets) > 450):
@@ -112,7 +111,7 @@ if __name__ == '__main__':
 	col 	=	["NoticiasRCN", "ELTIEMPO", "elespectador", "elpaiscali"]
 	mex		=	["NTelevisa_com", "lopezdoriga", "EPN"]
 	spain	=	["abc_es", "informacion_es", "elperiodico", "_rebelion_org", "Overwatch_Esp", "radiocable"]
-	usa 	=	["despiertamerica"]
+	usa 	=	["ElNuevoDia", "LaOpinionLA", "elnuevoherald","vivelohoy","despiertamerica"]
 
 	for account in chile:
 		get_all_tweets(account, "Chile")
