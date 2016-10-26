@@ -68,6 +68,7 @@ def get_all_tweets(screen_name, country):
 				print "%s tweets so far" % (len(alltweets))
 		
 		outtweets = []
+		added =0
 		deleted=0
 		#transform the tweepy tweets into a 2D array that will populate the csv	
 		for tweet in alltweets:
@@ -78,9 +79,10 @@ def get_all_tweets(screen_name, country):
 				text = re.sub(r'[\"#]', "", text)	# cleaning quotes and hashtags
 				text = re.sub(r'[\n]', "", text)	# cleaning quotes and hashtags
 				outtweets.append([id_str,text,country])
+				added +=1
 			else:
 				deleted +=1
-		print "total deleted %s" % deleted
+		print "total deleted: %s & total added: %s" % ((deleted),(added))
 		#outtweets = [[screen_name, tweet.text.encode("utf-8")] for tweet in alltweets]
 		
 		if(len(outtweets) > 450):
@@ -109,7 +111,7 @@ if __name__ == '__main__':
 	chile 	=	["latercera", "Emol", "TVN", "CNNChile", "Cooperativa"]
 	arg		=	["eltreceoficial", "LANACION", "clarincom", "24conurbano", "populardiario"]
 	col 	=	["NoticiasRCN", "ELTIEMPO", "elespectador", "elpaiscali"]
-	mex		=	["NTelevisa_com", "lopezdoriga", "EPN"]
+	mex		=	["NTelevisa_com", "lopezdoriga", "EPN", "EugenioDerbez", "CNNMex"]
 	spain	=	["abc_es", "informacion_es", "elperiodico", "_rebelion_org", "Overwatch_Esp", "radiocable"]
 	usa 	=	["ElNuevoDia", "LaOpinionLA", "elnuevoherald","vivelohoy","despiertamerica"]
 
