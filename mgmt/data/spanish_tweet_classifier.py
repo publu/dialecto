@@ -18,6 +18,7 @@ class tweet_classifier:
         self.tweet_word_tokens = [] 
         self.tweet_bigram = {}
         self.tweets_list_f = {}
+        self.unigram = {}
         
         #Create the nltk tokenizer object
         self.tknzr = TweetTokenizer(strip_handles=True, reduce_len=True)
@@ -105,12 +106,11 @@ class tweet_classifier:
                     d[i[0]][i[1]] = 1
         for key in d.keys():
             total = sum(d[key].values())
-            
+
         for key in d.keys():
             for skey in d[key].keys():
                 d[key][skey] = float(d[key][skey])/total
         return d       
-        
     def createUnigramModel(self, tweet_token_list):
         """
         Returns a unigram model in a dictionary that holds the probability of a
@@ -131,9 +131,18 @@ class tweet_classifier:
                     
         #Calculate the probability of a single token across the entire unigram
         #Divide the number of times we encountered a particular token by the total
+        
         for token in unigram:
+            #obtain the rough percentage of each token in the entire body of text
             unigram[token] = float(unigram[token]/total)
-        return unigram
+            #normalize it
+        maxVal = max(unigram.values())
+        print maxVal
+        minVal = min(unigram.values())
+        print minVal
+        for token in unigram:
+            unigram[token] = float((unigram[token] - minVal)/(maxVal - minVal))
+        self.unigram = unigram
         
     def createBigramModel(self, tweet_token_list):
         """
@@ -143,7 +152,14 @@ class tweet_classifier:
         print "Finished making bigram"
         print self.bigram
         return bigram
-
+        
+    def classify_tweet(self, tweet):
+        total_token_probability = 1.0
+        for token in tweet:
+            if token in self.unigram:
+                total_token_probability = total_token_probability * self.unigram[token]
+        if total_token_probability > 0.001:
+            print "Flag tweet" 
 
 c = tweet_classifier()
 u = c.createUnigramModel(c.tweet_word_tokens)
