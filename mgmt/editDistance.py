@@ -45,7 +45,7 @@ def levenshtein(sentOne, sentTwo):
 
     return editMatrix[len(sentTwo) - 1][len(sentOne) - 1]
 
-def mainFunction (numOfLoops, countryOne, countryTwo):
+def mainFunction (numOfLoops, countryOne, countryTwo, unwantedTweets):
 
     editDistance = 5
     
@@ -142,12 +142,38 @@ def mainFunction (numOfLoops, countryOne, countryTwo):
                         print("++++++++++++++++++++++++++++++++++++++++++")
                         print(distance)
                         print("++++++++++++++++++++++++++++++++++++++++++")
+                        
+                        if tempT not in unwantedTweets:
+                            unwantedTweets.append(tempT)
+                        if currentT not in unwantedTweets:
+                            unwantedTweets.append(currentT)
 
+def makeNewFiles(country, unwantedTweets):
+    for i in range(len(country)):
+        tweets = []
+        file_name = 'data/' + country[i] + '_tweets.csv'
+        new_file_name = 'editDistanceData/' + country[i] + '_tweets.csv'
 
+        #importing all the tweets for acocunt
+        with open(file_name, 'rb') as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                teststring = unicode(row[0], 'utf-8')
+                if teststring not in unwantedTweets:
+                    tweets.append([row[0],row[1]])
+                    #TEMPORARY CODE UNTIL WE GET REAL DATA
+                    #tweets.append([row[0], teststring, row[2]])
+                    
+        #making new file
+        with open(new_file_name, 'a') as f:
+            writer = csv.writer(f)
+            writer.writerows(tweets)
 
 
 
 if __name__ == '__main__':
+    unwantedTweets = []
+    
     chile 	=	["latercera", "Emol", "TVN", "CNNChile", "Cooperativa"]
     arg		=	["eltreceoficial", "LANACION", "clarincom", "24conurbano", "populardiario"]
     col 	=	["NoticiasRCN", "ELTIEMPO", "elespectador", "elpaiscali"]
@@ -156,67 +182,81 @@ if __name__ == '__main__':
     usa 	=	["ElNuevoDia", "primerahora", "LaOpinionLA", "elnuevoherald", "vivelohoy", "despiertamerica"]
 
     #CHILE - SELF
-    mainFunction(4, chile, chile)
-
+    mainFunction(4, chile, chile, unwantedTweets)
+    
     #ARGENTINA - SELF
-    mainFunction(4, arg, arg)
-
+    mainFunction(4, arg, arg, unwantedTweets)
+    
     #COLUMBIA - SELF
-    mainFunction(3, col, col)
-
+    mainFunction(3, col, col, unwantedTweets)
+    
     #MEXICO - SELF
-    mainFunction(3, mex, mex)
-
+    mainFunction(3, mex, mex, unwantedTweets)
+    
     #SPAIN - SELF
-    mainFunction(5, spain, spain)
-
+    mainFunction(5, spain, spain, unwantedTweets)
+    
     #USA - SELF
-    mainFunction(5, usa, usa)
-
+    mainFunction(5, usa, usa, unwantedTweets)
+    
     #CHILE - ARGENTINA
-    mainFunction(4, chile, arg)
-
+    mainFunction(4, chile, arg, unwantedTweets)
+    
     #CHILE - COLUMBIA
-    mainFunction(4, col, chile)
-
+    mainFunction(4, col, chile, unwantedTweets)
+    
     #CHILE - MEXICO
-    mainFunction(4, mex, chile)
-
+    mainFunction(4, mex, chile, unwantedTweets)
+    
     #CHILE - SPAIN
-    mainFunction(5, chile, spain)
-
+    mainFunction(5, chile, spain, unwantedTweets)
+    
     #CHILE - USA
-    mainFunction(5, chile, usa)
-
+    mainFunction(5, chile, usa, unwantedTweets)
+    
     #ARGENTINA - COLUMBIA
-    mainFunction(4, col, arg)
-
+    mainFunction(4, col, arg, unwantedTweets)
+    
     #ARGENTINA - MEXICO
-    mainFunction(4, mex, arg)
-
+    mainFunction(4, mex, arg, unwantedTweets)
+    
     #ARGENTINA - SPAIN
-    mainFunction(5, arg, spain)
-
+    mainFunction(5, arg, spain, unwantedTweets)
+    
     #ARGENTINA - USA
-    mainFunction(5, arg, usa)
-
+    mainFunction(5, arg, usa, unwantedTweets)
+    
     #COLUMBIA - MEXICO
-    mainFunction(3, col, mex)
-
+    mainFunction(3, col, mex, unwantedTweets)
+    
     #COLUMBIA - SPAIN
-    mainFunction(4, col, spain)
-
+    mainFunction(4, col, spain, unwantedTweets)
+    
     #COLUMBIA - USA
-    mainFunction(4, col, usa)
-
+    mainFunction(4, col, usa, unwantedTweets)
+    
     #MEXICO - SPAIN
-    mainFunction(4, mex, spain)
-
+    mainFunction(4, mex, spain, unwantedTweets)
+    
     #MEXICO - USA
-    mainFunction(4, mex, usa)
-
+    mainFunction(4, mex, usa, unwantedTweets)
+    
     #SPAIN - USA
-    mainFunction(5, usa, spain)
+    mainFunction(5, usa, spain, unwantedTweets)
+    
+    print (unwantedTweets)
 
-
+    #remake files
+    #CHILE
+    makeNewFiles(chile, unwantedTweets)
+    #ARGENTINA
+    makeNewFiles(arg, unwantedTweets)
+    #COLUMBIA
+    makeNewFiles(col, unwantedTweets)
+    #MEXICO
+    makeNewFiles(mex, unwantedTweets)
+    #SPAIN
+    makeNewFiles(spain, unwantedTweets)
+    #USA
+    makeNewFiles(usa, unwantedTweets)
 
