@@ -2,6 +2,7 @@ import csv
 from nltk.tokenize import word_tokenize
 import re
 from time import sleep
+from decimal import *
 
 def levenshtein(sentOne, sentTwo):
     #variables used to calculate edit distance
@@ -148,7 +149,7 @@ def mainFunction (numOfLoops, countryOne, countryTwo, unwantedTweets):
                         if currentT not in unwantedTweets:
                             unwantedTweets.append(currentT)
 
-def makeNewFiles(country, unwantedTweets):
+def makeNewFiles(country, unwantedTweets, master, masterT):
     for i in range(len(country)):
         tweets = []
         file_name = 'data/' + country[i] + '_tweets.csv'
@@ -161,9 +162,19 @@ def makeNewFiles(country, unwantedTweets):
                 teststring = unicode(row[0], 'utf-8')
                 if teststring not in unwantedTweets:
                     tweets.append([row[0],row[1]])
-                    #TEMPORARY CODE UNTIL WE GET REAL DATA
-                    #tweets.append([row[0], teststring, row[2]])
-                    
+                    if (row[0] == "text" or row[0] == " " or row[0] == ""):
+                        continue
+                
+                    #if(len(master) != 0):
+                    #       print(Decimal(len(masterT))/Decimal(len(master)))
+                
+                    if (len(master) == 0 or Decimal(len(masterT))/Decimal(len(master)) > .2):
+                        master.append([row[0],row[1]])
+                    else:
+                        masterT.append([row[0],row[1]])
+                        #TEMPORARY CODE UNTIL WE GET REAL DATA
+                        #tweets.append([row[0], teststring, row[2]])
+        
         #making new file
         with open(new_file_name, 'a') as f:
             writer = csv.writer(f)
@@ -172,6 +183,10 @@ def makeNewFiles(country, unwantedTweets):
 
 
 if __name__ == '__main__':
+    master_name = 'editDistanceData/' + 'MASTER_tweets.csv'
+    master_t_name = 'editDistanceData/' + 'MASTER20_tweets.csv'
+    master = []
+    masterT = []
     unwantedTweets = []
     
     chile 	=	["latercera", "Emol", "TVN", "CNNChile", "Cooperativa"]
@@ -243,20 +258,31 @@ if __name__ == '__main__':
     
     #SPAIN - USA
     mainFunction(5, usa, spain, unwantedTweets)
+
+    
     
     print (unwantedTweets)
 
     #remake files
     #CHILE
-    makeNewFiles(chile, unwantedTweets)
+    makeNewFiles(chile, unwantedTweets, master, masterT)
     #ARGENTINA
-    makeNewFiles(arg, unwantedTweets)
+    makeNewFiles(arg, unwantedTweets, master, masterT)
     #COLUMBIA
-    makeNewFiles(col, unwantedTweets)
+    makeNewFiles(col, unwantedTweets, master, masterT)
     #MEXICO
-    makeNewFiles(mex, unwantedTweets)
+    makeNewFiles(mex, unwantedTweets, master, masterT)
     #SPAIN
-    makeNewFiles(spain, unwantedTweets)
+    makeNewFiles(spain, unwantedTweets, master, masterT)
     #USA
-    makeNewFiles(usa, unwantedTweets)
+    makeNewFiles(usa, unwantedTweets, master, masterT)
+
+    #making new file
+    with open(master_name, 'a') as f:
+        writer = csv.writer(f)
+        writer.writerows(master)
+    #making new file
+    with open(master_t_name, 'a') as f:
+        writer = csv.writer(f)
+        writer.writerows(masterT)
 
