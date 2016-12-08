@@ -3,6 +3,7 @@ from nltk import ngrams
 import csv 
 import os
 import pickle
+import random
 
 class tweet_classifier:
     
@@ -19,6 +20,7 @@ class tweet_classifier:
         self.tweet_word_tokens = [] 
         self.tweet_bigram = {}
         self.tweets_list_f = {}
+        self.test_tweets = {}
         self.unigram = {}
         self.filename_countries = {}
         
@@ -192,7 +194,23 @@ class tweet_classifier:
         print "Finished making bigram"
         print self.bigram
         return bigram
-        
+    
+    def split_train_test(self):
+        """
+        Splits the tweets into 80% training and testing data
+        """
+        self.test_tweets = {}
+        for name in self.filenames:
+            #For 20% of the data in this account
+            self.test_tweets[name] = []
+            for i in range(int(len(self.tweets_list_f[name])*.2)):
+                #Choose a random tweet from the list of tweets in that account
+                tweet = random.choice(self.tweets_list_f[name])
+                #Add it to the list of test tweets2
+                self.test_tweets[name].append(tweet)
+                #delete the tweet from the training list
+                self.tweets_list_f[name].remove(tweet)
+                
     def filter_tweet(self, tweet):
         """
         Returns true if a tweet has a token probability product greater than the acceptable treshold
@@ -221,6 +239,33 @@ class tweet_classifier:
                     #outtweets = [[tweet,"country], [t,c], [t,c]]
                     outtweets.append([tweet,self.filename_countries[name]])
             writer.writerows(outtweets)
+            
+    def save_train_test(self):
+        cwd = os.getcwd()
+        cwd1 = cwd + "\\results\\train.csv"
+        cwd2 = cwd + "\\results\\test.csv"
+        outtweets = []
+        outtweets2 = []
+        with open(cwd1, 'wb') as csvFile:
+            writer = csv.writer(csvFile)
+            #For every filename
+            for name in self.filenames:
+                #For every tweet in that account
+                for tweet in self.tweets_list_f[name]:
+                    #Create a list containing the tweet and the country it's from
+                    #outtweets = [[tweet,"country], [t,c], [t,c]]
+                    outtweets.append([tweet,self.filename_countries[name]])
+            writer.writerows(outtweets)
+            
+        with open(cwd2, 'wb') as csvFileTest:
+            writer2 = csv.writer(csvFileTest)
+            for name in self.filenames:
+                #For every tweet in that account
+                for tweet in self.test_tweets[name]:
+                    #Create a list containing the tweet and the country it's from
+                    #outtweets2 = [[tweet,"country], [t,c], [t,c]]
+                    outtweets2.append([tweet,self.filename_countries[name]])
+            writer2.writerows(outtweets2)
        
     def save_unigram(self, obj, name):
         with open(name + '.pkl', 'wb') as f:
@@ -231,11 +276,17 @@ class tweet_classifier:
             return pickle.load(f)
             
     def main(self):
-        u = self.createUnigramModel(self.tweet_word_tokens)
-        self.save_unigram(u, 'unigram')
-        self.run_filter()
-        self.save_filtered_tweets()
-            
+        c = raw_input("What do you want to do?\n[1] Filter data\n[2] Split data into training and test set\n: ")
+        if int(c) == 1:
+            u = self.createUnigramModel(self.tweet_word_tokens)
+            self.save_unigram(u, 'unigram')
+            self.run_filter()
+            self.save_filtered_tweets()
+        elif int(c) == 2:
+            self.split_train_test()
+            self.save_train_test()
+        else:
+            print "Invalid input"
 c = tweet_classifier()
 c.main()
 
