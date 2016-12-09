@@ -112,11 +112,14 @@ class tweet_classifier:
     def five_most_uncommon(self):
         tokens_by_country = self.tweet_tokens_by_country()
         #Create a unigram for each country
+        print tokens_by_country
         for country in tokens_by_country:
             unigram = self.createUnigramModel(tokens_by_country[country])
-            n_items = self.take(5, unigram.iteritems())
-            for i in n_items:
-                print "Country: " + country + ", " + str(i)
+            print "The five most uncommon words for: " + country
+            print unigram[:5]
+            #n_items = self.take(5, unigram.iteritems())
+            #for i in n_items:
+            #    print "Country: " + country + ", " + str(i)
             
         
         
