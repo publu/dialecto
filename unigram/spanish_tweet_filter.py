@@ -4,6 +4,7 @@ import csv
 import os
 import pickle
 import random
+from itertools import islice
 
 class tweet_classifier:
     
@@ -27,7 +28,7 @@ class tweet_classifier:
         #Create the nltk tokenizer object
         self.tknzr = TweetTokenizer(strip_handles=True, reduce_len=True)
         
-        #Get all the filnemaes in the directory except for this file
+        #Get all the filenames in the directory except for this file
         self.filenames = os.listdir(os.getcwd())
         self.filenames.remove(os.path.basename(__file__))
         if 'unigram.pkl' in self.filenames:
@@ -72,7 +73,11 @@ class tweet_classifier:
             text = unicode(text, 'utf-8')
         except TypeError:
             return text
-    
+            
+    def take(self, n, iterable):
+        "Return first n items of the iterable as a list"
+        return list(islice(iterable, n))
+        
     def collect_tweets(self, filename):
         """
         Opens CSV given by filename and stores each tweet in a list
@@ -86,40 +91,34 @@ class tweet_classifier:
                 tweet_text.append(row[1])
                 self.filename_countries[filename] = row[2]
         return tweet_text
-                
-    def bigramModel(self, tweetNgram):
-        """
-        Returns a bigram model as a dictionary
         
-        Input format:
-            tokens = ['el', 'carro', 'va']
-            tweetNgram = nltk.ngrams(tokens)
-            tweetNgram = [('el', 'carro'), ('carro', 'va')]
+    def tweet_tokens_by_country(self):
+        tweet_tokens_by_country = []
+        tokens_by_country = {}
+        #Initialize the dictionary of countries so that each country has a list already
+        for country in self.filename_countries.values():
+            tokens_by_country[country] = []
             
-        Output format:
-            d[tweet_token1][tweet_token_after_token1] = Probability of seeing these two tokens together
-            Ex:
-            d['el']['carro'] = 0.5
-        """
-        d = {}
-        total = 0.0
-        for t in tweetNgram:
-            for i in t:
-                if i[0] in d:
-                    if i[1] in d[i[0]]:
-                        d[i[0]][i[1]] += 1
-                    else:
-                        d[i[0]][i[1]] = 1
-                else:
-                    d[i[0]] = {}
-                    d[i[0]][i[1]] = 1
-        for key in d.keys():
-            total = sum(d[key].values())
-
-        for key in d.keys():
-            for skey in d[key].keys():
-                d[key][skey] = float(d[key][skey])/total
-        return d       
+        for name in self.filenames:
+            tweet_tokens_by_country = []
+            #For every tweet in that filename
+            for tweet in self.tweets_list_f[name]:
+                #tokenize it and add it to the list
+                tweet_tokens_by_country.append(self.tknzr.tokenize(tweet))
+            #Extend the list of tokens for that country with the tokens that we collected for this file
+            tokens_by_country[self.filename_countries[name]].extend(tweet_tokens_by_country)
+        return tokens_by_country
+        
+    def five_most_uncommon(self):
+        tokens_by_country = self.tweet_tokens_by_country()
+        #Create a unigram for each country
+        for country in tokens_by_country:
+            unigram = self.createUnigramModel(tokens_by_country[country])
+            n_items = self.take(5, unigram.iteritems())
+            for i in n_items:
+                print "Country: " + country + ", " + str(i)
+            
+        
         
     def createUnigramModel(self, tweet_token_list):
         """
@@ -285,8 +284,11 @@ class tweet_classifier:
         elif int(c) == 2:
             self.split_train_test()
             self.save_train_test()
+        elif int(c) == 3:
+            self.five_most_uncommon()
         else:
             print "Invalid input"
+            
 c = tweet_classifier()
 c.main()
 

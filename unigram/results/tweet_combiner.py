@@ -14,7 +14,8 @@ def add_string_c(tweet, key):
             
 def save_combined_tweets(tweet_dict):
     outtweets = []
-    with open('c_results.csv', 'wb') as csvfile:
+    filename = raw_input("Enter a results filename: ")
+    with open(filename, 'wb') as csvfile:
         writer = csv.writer(csvfile)
         #For every country
         for key in tweet_dict.keys():
@@ -30,8 +31,9 @@ def save_combined_tweets(tweet_dict):
 d = {}
 tweets = []
 countries = []
-print "Now opening file..."
-with open('results.csv', 'r') as f:
+#print "Now opening file..."
+filename = raw_input("Enter an input filename: ")
+with open(filename, 'r') as f:
     reader = csv.reader(f)
     for row in reader:
         tweet = row[0]
