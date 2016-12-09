@@ -61,7 +61,8 @@
 
     function strip(data) {
         return data.replace(/<b[^>]*>(.*?)<\/b>/gi, function(a, s) {
-                return s; })
+                return s;
+            })
             .replace(/class="(?!(tco-hidden|tco-display|tco-ellipsis))+.*?"|data-query-source=".*?"|dir=".*?"|rel=".*?"/gi,
                 '');
     }
@@ -332,7 +333,7 @@
                                 '</div>';
                             op += userStuff.replace('data-scribe="element:avatar"', 'data-scribe="element:avatar" class="post-avatar"');
                         }
-                        if (printTime) {
+                        if (false) {
                             if (permalinks) {
                                 op += '<p class="timePosted">' + times[n].getAttribute('aria-label') + '</p>';
                             } else {
@@ -341,6 +342,31 @@
                             }
                         }
                         op += '<p class="tweet">' + strip(tweets[n].innerHTML) + '</p>';
+
+                        var all = [];
+                        all.push(["latercera", "Emol", "TVN", "CNNChile", "Cooperativa"]);
+                        all.push(["eltreceoficial", "LANACION", "clarincom", "24conurbano", "populardiario"]);
+                        all.push(["NoticiasRCN", "ELTIEMPO", "elespectador", "elpaiscali"]);
+                        all.push(["NTelevisa_com", "lopezdoriga", "EPN", "EugenioDerbez", "CNNMex"]);
+                        all.push(["abc_es", "informacion_es", "elperiodico", "_rebelion_org", "Overwatch_Esp", "radiocable"]);
+                        all.push(["ElNuevoDia", "LaOpinionLA", "elnuevoherald", "vivelohoy", "despiertamerica"]);
+
+                        var addText = '<header class="post-header" style="padding-bottom: 20px;"> <p class="post-meta content-subhead">';
+                        var countries = ["Chile", "Argentina", "Colombia", "Mexico", "Spain", "USA"];
+                        var countryEmoji = ["🇨🇱", "🇦🇷", "🇨🇴", "🇲🇽", "🇪🇸", "🇺🇸"];
+                        var countryColor = ["post-category-js", "post-category-pure", "post-category-yui", "post-category-design", "post-category-pure", "post-category-js"];
+                        var numberThing = 0;
+                        all.forEach(function(country) {
+                            country.forEach(function(account) {
+                                if(authors[n].innerHTML.includes(account))
+                                {   
+                                    addText += '<a class="post-category ' + countryColor[numberThing] +'">' + countries[numberThing] + " " + countryEmoji[numberThing] +'</a>';
+                                }
+                            })
+                            numberThing+=1;
+                        })
+                        addText += '</p> </header>'
+                        op += addText;
                     } else {
                         if (tweets[n].textContent) {
                             if (printUser) {

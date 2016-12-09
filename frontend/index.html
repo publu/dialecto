@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="A layout example that shows off a blog page with a list of posts.">
-    <title>Blog &ndash; Layout Examples &ndash; Pure</title>
+    <title>Dialecto &ndash; Tweet Stream</title>
     <link rel="stylesheet" href="https://unpkg.com/purecss@0.6.0/build/pure-min.css">
     <!--[if lte IE 8]>
         <link rel="stylesheet" href="https://unpkg.com/purecss@0.6.0/build/grids-responsive-old-ie-min.css">
@@ -22,18 +22,28 @@
     <!--[if lt IE 9]>
         <script src="http://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.js"></script>
     <![endif]-->
+    <style>
+.header {
+    margin: 60% 2em 0;
+    text-align: right;
+}
+    </style>
 </head>
 
 <body>
     <div id="layout" class="pure-g">
         <div class="sidebar pure-u-1 pure-u-md-1-4">
             <div class="header">
-                <h1 class="brand-title">A Dialect Analyzer</h1>
-                <h2 class="brand-tagline">thing description</h2>
+
+                <h1 class="brand-title">Dialecto</h1>
+                <h2 class="brand-tagline">A Dialect Analyzer</h2>
+
+                <img style="padding-top:20px;padding-bottom:20px;width:200px;" src="/watson.png">
+
                 <nav class="nav">
                     <ul class="nav-list">
                         <li class="nav-item">
-                            <a class="pure-button" href="http://yuilibrary.com">YUI Library</a>
+                            <a class="pure-button">Powered By Watson</a>
                         </li>
                     </ul>
                 </nav>
@@ -42,32 +52,11 @@
         <div class="content pure-u-1 pure-u-md-3-4">
             <div>
                 <!-- A wrapper for all the blog posts -->
-                <div class="posts">
-                    <h1 class="content-subhead">Main Page</h1>
-                    <!-- A single blog post -->
-                    <section class="post">
-                        <header class="post-header">
-                            <h2 class="post-title">Introducing Dialecto</h2>
-                            <p class="post-meta">
-                                By <a href="#" class="post-author">Tilo Mitra</a> under <a class="post-category post-category-design" href="#">CSS</a> <a class="post-category post-category-pure" href="#">Pure</a>
-                            </p>
-                        </header>
-                        <div class="post-description">
-                            <p>
-                                Yesterday at CSSConf, we launched Pure – a new CSS library. Phew! Here are the slides from the presentation</a>. Although it looks pretty minimalist, we’ve been working on Pure for several months. After many iterations, we have released Pure as a set of small, responsive, CSS modules that you can use in every web project.
-                            </p>
-                        </div>
-                    </section>
-                </div>
-                <div class="posts">
-                    <h1 class="content-subhead">Tweet Stream</h1>
-                    <!-- A single blog post -->
-                    <section class="post">
-                        <header class="post-header">
-                            <h2 class="post-title">Real Time</h2>
-                        </header>
-                    </section>
+                <p class="content-subhead">Available Countries: 🇨🇱 🇦🇷 🇨🇴 🇲🇽 🇪🇸 🇺🇸</p>
 
+                <div class="posts">
+                    <h1 class="content-subhead">Real Time Tweet Stream</h1>
+                    <!-- A single blog post -->
                     <div id="theTweets">
                     </div>
                 </div>
@@ -273,6 +262,12 @@
     </script>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
     <script src="js/index.js"></script>
+    <script>
+    setTimeout(function() {
+    jQuery("[data-scribe='element:verified_badge']").hide()
+    jQuery( "[data-scribe='element:screen_name']" ).hide()
+    }, 500);
+    </script>
 </body>
 
 </html>
