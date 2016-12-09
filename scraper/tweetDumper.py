@@ -51,30 +51,38 @@ def get_all_tweets(screen_name, country):
 		#keep grabbing tweets until there are no tweets left to grab
 
 		while len(new_tweets) > 0:
-			print "before %s" % (oldest)
-			
-			#all subsiquent requests use the max_id param to prevent duplicates
-			new_tweets = api.user_timeline(screen_name = screen_name,count=200,max_id=oldest,since_id=last_id)
-			
-			#save most recent tweets
-			alltweets.extend(new_tweets)
-			
-			#update the id of the oldest tweet less one
-			oldest = alltweets[-1].id - 1
-			
-			print "%s tweets so far" % (len(alltweets))
+			print "before %s but after %s" % ((oldest),(last_id) )
+			if(int(oldest)<int(last_id) ):
+				print "deleting"
+				new_tweets = []
+			else:
+				#all subsiquent requests use the max_id param to prevent duplicates
+				new_tweets = api.user_timeline(screen_name = screen_name,count=200,max_id=oldest)
+				
+				#save most recent tweets
+				alltweets.extend(new_tweets)
+				
+				#update the id of the oldest tweet less one
+				oldest = alltweets[-1].id - 1
+
+				print "%s tweets so far" % (len(alltweets))
 		
 		outtweets = []
+		added =0
+		deleted=0
 		#transform the tweepy tweets into a 2D array that will populate the csv	
 		for tweet in alltweets:
-			text = tweet.text.encode("utf-8")
-			id_str = tweet.id_str.encode("utf-8")
-			text = re.sub(r'http\S+', "", text)	# cleaning urls
-			text = re.sub(r'[\"#]', "", text)	# cleaning quotes and hashtags
-			text = re.sub(r'[\n]', "", text)	# cleaning quotes and hashtags
-
-			outtweets.append([id_str,text,country])
-
+			if(last_id < tweet.id): #if the id is newer
+				text = tweet.text.encode("utf-8")
+				id_str = tweet.id_str.encode("utf-8")
+				text = re.sub(r'http\S+', "", text)	# cleaning urls
+				text = re.sub(r'[\"#]', "", text)	# cleaning quotes and hashtags
+				text = re.sub(r'[\n]', "", text)	# cleaning quotes and hashtags
+				outtweets.append([id_str,text,country])
+				added +=1
+			else:
+				deleted +=1
+		print "total deleted: %s & total added: %s" % ((deleted),(added))
 		#outtweets = [[screen_name, tweet.text.encode("utf-8")] for tweet in alltweets]
 		
 		if(len(outtweets) > 450):
@@ -94,7 +102,7 @@ def get_all_tweets(screen_name, country):
 		print "no new tweets found."
 
 	print "now we wait %s seconds..." % str(time)
-	sleep(time)
+	#sleep(time)
 	pass
 
 
@@ -103,9 +111,9 @@ if __name__ == '__main__':
 	chile 	=	["latercera", "Emol", "TVN", "CNNChile", "Cooperativa"]
 	arg		=	["eltreceoficial", "LANACION", "clarincom", "24conurbano", "populardiario"]
 	col 	=	["NoticiasRCN", "ELTIEMPO", "elespectador", "elpaiscali"]
-	mex		=	["NTelevisa_com", "lopezdoriga", "EPN"]
+	mex		=	["NTelevisa_com", "lopezdoriga", "EPN", "EugenioDerbez", "CNNMex"]
 	spain	=	["abc_es", "informacion_es", "elperiodico", "_rebelion_org", "Overwatch_Esp", "radiocable"]
-	usa 	=	["despiertamerica"]
+	usa 	=	["ElNuevoDia", "LaOpinionLA", "elnuevoherald","vivelohoy","despiertamerica"]
 
 	for account in chile:
 		get_all_tweets(account, "Chile")
